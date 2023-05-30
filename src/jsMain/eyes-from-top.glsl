@@ -24,28 +24,24 @@ uniform vec2 center; // @@XyPad
 
 float calculate_angle(vec2 pos) {
     float angle = atan(pos.y, pos.x);
-    if (angle < 0.0)
-        angle += 2.0 * PI;
-    angle = mod(angle + 1.5 * PI, 2.0 * PI);
     return angle;
 }
 
+
 // @param params moving-head-params
 void main(out MovingHeadParams params) {
-
-
     vec2 physicalLocation = vec2(DISTANCE_SIDEWAYS * center.x , DISTANCE_FORWARD * (center.y + 1.0) /2.0 );
     vec2 fixturePosition = vec2(fixtureInfo.position.z,fixtureInfo.position.x );
     vec2 fixtureToTarget = physicalLocation -fixturePosition;
 
 
-    params.pan = calculate_angle(fixtureToTarget) + PI;
+    params.pan = calculate_angle(fixtureToTarget) + 3.0 / 4.0 * 2.0 * PI;
 
 
     // For other y values, interpolate between the two extremes.
     float tiltDown = PI / 2.0;
     float tiltForward = atan(fixtureInfo.position.y  / DISTANCE_FORWARD );
-    params.tilt = mix(tiltDown, tiltForward, center.y * 0.5 + 0.5 );
+    params.tilt = -mix(tiltDown, tiltForward, center.y * 0.5 + 0.5 );
 
 
     // Set the other parameters as before
@@ -54,6 +50,6 @@ void main(out MovingHeadParams params) {
 
 
     //params.pan = PI;
-    //params.tilt = atan(fixtureInfo.position.y  / DISTANCE_FORWARD );
+    //params.tilt = -1.0;
     //params.dimmer = physicalLocation.x;
 }
