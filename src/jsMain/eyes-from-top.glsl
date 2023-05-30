@@ -15,6 +15,7 @@ struct MovingHeadParams {
 #define PAN_RANGE (PI * 3.0)
 #define TILT_RANGE (PI * 1.5)
 #define DISTANCE_FORWARD 1000.0 // cm
+#define DISTANCE_SIDEWAYS 500.0 // cm on each side
 
 uniform FixtureInfo fixtureInfo;
 
@@ -31,15 +32,14 @@ float calculate_angle(vec2 pos) {
 
 // @param params moving-head-params
 void main(out MovingHeadParams params) {
-    vec2 targetPoint = center;
-    vec2 fixtureToTarget = center - vec2(-fixtureInfo.position.z, fixtureInfo.position.x);
 
-    // Calculate distance from the fixture to the target point on the ground
-    float groundDistance = length(fixtureToTarget);
 
-    // Calculate the pan and tilt angles
-    // The pan angle is the angle in the x-z plane (horizontal plane)
-    params.pan = calculate_angle(fixtureToTarget);
+    vec2 physicalLocation = vec2(DISTANCE_SIDEWAYS * center.x , DISTANCE_FORWARD * (center.y + 1.0) /2.0 );
+    vec2 fixturePosition = vec2(fixtureInfo.position.z,fixtureInfo.position.x );
+    vec2 fixtureToTarget = physicalLocation -fixturePosition;
+
+
+    params.pan = calculate_angle(fixtureToTarget) + PI;
 
 
     // For other y values, interpolate between the two extremes.
@@ -55,5 +55,5 @@ void main(out MovingHeadParams params) {
 
     //params.pan = PI;
     //params.tilt = atan(fixtureInfo.position.y  / DISTANCE_FORWARD );
-
+    //params.dimmer = physicalLocation.x;
 }
