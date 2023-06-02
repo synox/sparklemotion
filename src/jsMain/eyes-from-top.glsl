@@ -27,9 +27,17 @@ float calculate_angle(vec2 pos) {
     return angle;
 }
 
+float normalizeCenter(float angle) {
+    if (angle < 0.0)
+        angle += 2.0 * PI;
+    angle = mod(angle + 3.0 / 4.0 * 2.0 * PI, 2.0 * PI);
+    return angle;
+}
 
 // @param params moving-head-params
 void main(out MovingHeadParams params) {
+
+
     vec2 physicalLocation = vec2(DISTANCE_SIDEWAYS * center.x , DISTANCE_FORWARD * (center.y + 1.0) /2.0 );
     vec2 fixturePosition = vec2(fixtureInfo.position.z,fixtureInfo.position.x );
     vec2 fixtureToTarget = physicalLocation -fixturePosition;
