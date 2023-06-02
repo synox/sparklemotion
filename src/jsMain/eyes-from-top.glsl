@@ -15,12 +15,22 @@ struct MovingHeadParams {
 #define PAN_RANGE (PI * 3.0)
 #define TILT_RANGE (PI * 1.5)
 #define DISTANCE_FORWARD 1000.0 // cm
-#define DISTANCE_SIDEWAYS 500.0 // cm on each side
+#define DISTANCE_SIDEWAYS 500.0 // cm to each side
 
 uniform FixtureInfo fixtureInfo;
 
 
 uniform vec2 center; // @@XyPad
+
+float angleToTarget(vec2 pos) {
+    float centerToEyesCm = fixtureInfo.position.z;
+    float xDistanceCm = pos.x * DISTANCE_SIDEWAYS;
+    float deltaXcm = xDistanceCm + centerToEyesCm;
+
+    float deltaY = pos.y * DISTANCE_FORWARD;
+    return atan(deltaY / deltaXcm);
+    //return -1.1;
+}
 
 float calculate_angle(vec2 pos) {
     float angle = atan(pos.y, pos.x);
@@ -43,7 +53,7 @@ void main(out MovingHeadParams params) {
     vec2 fixtureToTarget = physicalLocation -fixturePosition;
 
 
-    params.pan = calculate_angle(fixtureToTarget) + 3.0 / 4.0 * 2.0 * PI;
+    params.pan = 2.0 * PI   - angleToTarget(vec2(-1, 1)); //+ 3.0 / 4.0 * 2.0 * PI;
 
 
     // For other y values, interpolate between the two extremes.
@@ -58,6 +68,7 @@ void main(out MovingHeadParams params) {
 
 
     //params.pan = PI;
-    //params.tilt = -1.0;
+    params.tilt = -PI / 4.0;
     //params.dimmer = physicalLocation.x;
+    params.colorWheel = center.y;
 }
