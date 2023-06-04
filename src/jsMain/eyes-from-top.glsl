@@ -26,15 +26,24 @@ float angleToTarget(vec2 pos) {
     float deltaXInches = xDistanceInches - centerToEyesInches;
 
     float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
-    //return -fixtureInfo.rotation.y;
     return 2.0 * PI   - atan(deltaXInches / deltaY) - fixtureInfo.rotation.y;
 }
 
 float tiltToTarget(vec2 pos) {
-    float distanceForward = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
-    float diagonalForward = sqrt(distanceForward * distanceForward + DISTANCE_SIDEWAYS * DISTANCE_SIDEWAYS);
     float fixtureHeight = fixtureInfo.position.y;
-    //return fixtureHeight;
+
+    float distanceForward = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
+
+    float centerToEyesInches = fixtureInfo.position.z;
+    float xDistanceInches = pos.x * DISTANCE_SIDEWAYS;
+    float deltaXInches = xDistanceInches - centerToEyesInches;
+
+    float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
+
+
+    float diagonalForward = sqrt(distanceForward * distanceForward + deltaXInches * deltaXInches);
+
+
     return  - atan( fixtureHeight / diagonalForward);
     //return 1.0;
 }
