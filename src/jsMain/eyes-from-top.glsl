@@ -18,8 +18,6 @@ struct MovingHeadParams {
 #define DISTANCE_SIDEWAYS 500.0 // cm to each side
 
 uniform FixtureInfo fixtureInfo;
-
-
 uniform vec2 center; // @@XyPad
 
 float angleToTarget(vec2 pos) {
@@ -27,9 +25,16 @@ float angleToTarget(vec2 pos) {
     float xDistanceCm = pos.x * DISTANCE_SIDEWAYS;
     float deltaXcm = xDistanceCm + centerToEyesCm;
 
-    float deltaY = pos.y * DISTANCE_FORWARD;
+    float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0;
     return atan(deltaXcm / deltaY) + fixtureInfo.rotation.y;
-    //return -1.1;
+}
+
+float tiltToTarget(vec2 pos) {
+    float distanceForward = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0;
+    float fixtureHeight = fixtureInfo.position.y;
+    //return fixtureHeight;
+    return  - atan( fixtureHeight / (distanceForward + - 0.0 * fixtureInfo.position.x));
+    //return 1.0;
 }
 
 float calculate_angle(vec2 pos) {
@@ -56,11 +61,7 @@ void main(out MovingHeadParams params) {
     params.pan = 2.0 * PI   - angleToTarget(center); // vec2(-1, 1) //+ 3.0 / 4.0 * 2.0 * PI;
 
 
-    // For other y values, interpolate between the two extremes.
-    float tiltDown = PI / 2.0;
-    float tiltForward = atan(fixtureInfo.position.y  / DISTANCE_FORWARD );
-    params.tilt = -mix(tiltDown, tiltForward, center.y * 0.5 + 0.5 );
-
+    params.tilt = tiltToTarget(center);
 
     // Set the other parameters as before
     params.colorWheel = 0.;
@@ -68,7 +69,7 @@ void main(out MovingHeadParams params) {
 
 
     //params.pan = PI;
-    params.tilt = -PI / 4.0;
+
     //params.dimmer = physicalLocation.x;
     params.colorWheel = fixtureInfo.rotation.y;
 }
