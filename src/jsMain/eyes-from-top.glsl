@@ -30,10 +30,11 @@ float angleToTarget(vec2 pos) {
 }
 
 float tiltToTarget(vec2 pos) {
-    float distanceForward = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0;
+    float distanceForward = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
+    float diagonalForward = sqrt(distanceForward * distanceForward + DISTANCE_SIDEWAYS * DISTANCE_SIDEWAYS);
     float fixtureHeight = fixtureInfo.position.y;
     //return fixtureHeight;
-    return  - atan( fixtureHeight / (distanceForward + - 0.0 * fixtureInfo.position.x));
+    return  - atan( fixtureHeight / diagonalForward);
     //return 1.0;
 }
 
