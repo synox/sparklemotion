@@ -1,6 +1,6 @@
 struct FixtureInfo {
     vec3 position; // z=left/right y=height x=front-back
-    vec3 rotation; // y=left/right
+    vec3 rotation; // y=left/right yaw, z=pitch (0 is up), x=roll,
     mat4 transformation;
 };
 
@@ -28,7 +28,7 @@ float angleToTarget(vec2 pos) {
     float deltaXcm = xDistanceCm + centerToEyesCm;
 
     float deltaY = pos.y * DISTANCE_FORWARD;
-    return atan(deltaY / deltaXcm);
+    return atan(deltaXcm / deltaY) + fixtureInfo.rotation.y;
     //return -1.1;
 }
 
@@ -53,7 +53,7 @@ void main(out MovingHeadParams params) {
     vec2 fixtureToTarget = physicalLocation -fixturePosition;
 
 
-    params.pan = 2.0 * PI   - angleToTarget(vec2(-1, 1)); //+ 3.0 / 4.0 * 2.0 * PI;
+    params.pan = 2.0 * PI   - angleToTarget(center); // vec2(-1, 1) //+ 3.0 / 4.0 * 2.0 * PI;
 
 
     // For other y values, interpolate between the two extremes.
@@ -70,5 +70,5 @@ void main(out MovingHeadParams params) {
     //params.pan = PI;
     params.tilt = -PI / 4.0;
     //params.dimmer = physicalLocation.x;
-    params.colorWheel = center.y;
+    params.colorWheel = fixtureInfo.rotation.y;
 }
