@@ -14,19 +14,20 @@ struct MovingHeadParams {
 #define PI 3.14159265358979323846
 #define PAN_RANGE (PI * 3.0)
 #define TILT_RANGE (PI * 1.5)
-#define DISTANCE_FORWARD 1000.0 // cm
-#define DISTANCE_SIDEWAYS 500.0 // cm to each side
+#define DISTANCE_FORWARD 500.0 // Inches
+#define DISTANCE_SIDEWAYS 200.0 // Inches to each side
 
 uniform FixtureInfo fixtureInfo;
 uniform vec2 center; // @@XyPad
 
 float angleToTarget(vec2 pos) {
-    float centerToEyesCm = fixtureInfo.position.z;
-    float xDistanceCm = pos.x * DISTANCE_SIDEWAYS;
-    float deltaXcm = xDistanceCm + centerToEyesCm;
+    float centerToEyesInches = fixtureInfo.position.z;
+    float xDistanceInches = pos.x * DISTANCE_SIDEWAYS;
+    float deltaXInches = xDistanceInches - centerToEyesInches;
 
-    float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0;
-    return atan(deltaXcm / deltaY) + fixtureInfo.rotation.y;
+    float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
+    //return -fixtureInfo.rotation.y;
+    return 2.0 * PI   - atan(deltaXInches / deltaY) - fixtureInfo.rotation.y;
 }
 
 float tiltToTarget(vec2 pos) {
@@ -45,7 +46,7 @@ float calculate_angle(vec2 pos) {
 
 float normalizeCenter(float angle) {
     if (angle < 0.0)
-        angle += 2.0 * PI;
+    angle += 2.0 * PI;
     angle = mod(angle + 3.0 / 4.0 * 2.0 * PI, 2.0 * PI);
     return angle;
 }
@@ -59,7 +60,7 @@ void main(out MovingHeadParams params) {
     vec2 fixtureToTarget = physicalLocation -fixturePosition;
 
 
-    params.pan = 2.0 * PI   - angleToTarget(center); // vec2(-1, 1) //+ 3.0 / 4.0 * 2.0 * PI;
+    params.pan = angleToTarget(center); // vec2(-1, 1) //+ 3.0 / 4.0 * 2.0 * PI;
 
 
     params.tilt = tiltToTarget(center);
