@@ -20,67 +20,48 @@ struct MovingHeadParams {
 uniform FixtureInfo fixtureInfo;
 uniform vec2 center; // @@XyPad
 
-float angleToTarget(vec2 pos) {
-    float centerToEyesInches = fixtureInfo.position.z;
-    float xDistanceInches = pos.x * DISTANCE_SIDEWAYS;
-    float deltaXInches = xDistanceInches - centerToEyesInches;
 
-    float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
-    return 2.0 * PI   - atan(deltaXInches / deltaY) - fixtureInfo.rotation.y;
-}
-
-float tiltToTarget(vec2 pos) {
-    float fixtureHeight = fixtureInfo.position.y;
-
-    float distanceForward = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
-
-    float centerToEyesInches = fixtureInfo.position.z;
-    float xDistanceInches = pos.x * DISTANCE_SIDEWAYS;
-    float deltaXInches = xDistanceInches - centerToEyesInches;
-
-    float deltaY = (pos.y + 1.0) * DISTANCE_FORWARD / 2.0 + -fixtureInfo.position.x;
-
-
-    float diagonalForward = sqrt(distanceForward * distanceForward + deltaXInches * deltaXInches);
-
-
-    return  - atan( fixtureHeight / diagonalForward);
-    //return 1.0;
-}
-
-float calculate_angle(vec2 pos) {
-    float angle = atan(pos.y, pos.x);
-    return angle;
-}
-
-float normalizeCenter(float angle) {
-    if (angle < 0.0)
-    angle += 2.0 * PI;
-    angle = mod(angle + 3.0 / 4.0 * 2.0 * PI, 2.0 * PI);
-    return angle;
-}
 
 // @param params moving-head-params
 void main(out MovingHeadParams params) {
+    params.colorWheel = 0.0;
+
+    // x is forward
+    // z is sideways
+    // y is height
+
+    float centerToEyesInches = fixtureInfo.position.z;
+    float distanceToSide = center.x * DISTANCE_SIDEWAYS;
+    float distanceFromWall = (center.y + 1.0) * DISTANCE_FORWARD / 2.0;
 
 
-    vec2 physicalLocation = vec2(DISTANCE_SIDEWAYS * center.x , DISTANCE_FORWARD * (center.y + 1.0) /2.0 );
-    vec2 fixturePosition = vec2(fixtureInfo.position.z,fixtureInfo.position.x );
-    vec2 fixtureToTarget = physicalLocation -fixturePosition;
+    float dx = distanceFromWall - fixtureInfo.position.x;
+    float dz = distanceToSide - centerToEyesInches;
+    float dy = -fixtureInfo.position.y; // since y2 = 0 (point is on the floor)
 
 
-    params.pan = angleToTarget(center); // vec2(-1, 1) //+ 3.0 / 4.0 * 2.0 * PI;
+    float panAngle = atan(dz / dx);
+    params.colorWheel = panAngle;
+    params.pan = panAngle;
 
 
-    params.tilt = tiltToTarget(center);
+
+    float distanceHorizontal = sqrt(dx * dx + dz * dz);
+    float tiltAngle = atan(dy / distanceHorizontal);
+
+
+
+    params.tilt = tiltAngle;
+
+    //params.tilt = - PI / 4.0;
 
     // Set the other parameters as before
-    params.colorWheel = 0.;
+    //params.colorWheel = 0.;
     params.dimmer = 1.;
 
 
     //params.pan = PI;
 
     //params.dimmer = physicalLocation.x;
-    params.colorWheel = fixtureInfo.rotation.y;
+    //params.colorWheel = fixtureInfo.rotation.y;
 }
