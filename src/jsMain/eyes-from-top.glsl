@@ -40,18 +40,18 @@ void main(out MovingHeadParams params) {
     float dy = -fixtureInfo.position.y; // since y2 = 0 (point is on the floor)
 
 
-    float panAngle = atan(dz / dx);
+    float panAngle = atan(dz, dx);
     params.colorWheel = panAngle;
-    params.pan = panAngle;
+    params.pan = 1.0 * PI + -panAngle;
 
 
 
     float distanceHorizontal = sqrt(dx * dx + dz * dz);
-    float tiltAngle = atan(dy / distanceHorizontal);
+    float tiltAngle = atan(dy, distanceHorizontal);
 
 
 
-    params.tilt = tiltAngle;
+    params.tilt = -tiltAngle;
 
     //params.tilt = - PI / 4.0;
 
