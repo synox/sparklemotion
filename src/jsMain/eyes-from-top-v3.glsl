@@ -26,7 +26,8 @@ vec2 rotateAroundPoint(vec2 point, vec2 pivot, float angle) {
     float s = sin(angle);
     float c = cos(angle);
     mat2 m = mat2(c, -s, s, c);
-    point = m * point;
+    point[0] = c * point[0] - s * point[1];
+    point[1] = s * point[0] + c * point[1];
 
     // Translate back
     point += pivot;
@@ -57,7 +58,7 @@ void main(out MovingHeadParams params) {
     pointInFrontOfEye.y = targetPoint.y;
 
     // angle from pointInFrontOfEye to axis at x=0 y=0 z=?
-    params.pan =  1.0 * PI - atan(pointInFrontOfEye.z, fixtureInfo.position.y);
+    params.pan =  1.0 * PI - atan(pointInFrontOfEye.x, fixtureInfo.position.y);
     // 2.0 * PI +
 
     // params.pan = 1.0 * PI;
