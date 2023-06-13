@@ -57,17 +57,22 @@ void main(out MovingHeadParams params) {
     pointInFrontOfEye.xz = rotateAroundPoint(targetPoint.xz, fixtureInfo.position.xz, fixtureInfo.rotation.y);
     pointInFrontOfEye.y = targetPoint.y;
 
-    // angle from pointInFrontOfEye to axis at x=0 y=0 z=?
-    params.pan =  1.0 * PI - atan(pointInFrontOfEye.z, fixtureInfo.position.y);
-    params.pan =  1.0 * PI + center.x * 2.0;
-    // 2.0 * PI +
+    // looking from the front of the sheep, to opposite side is sideways (pointInFrontOfEye.z)
+    // plus eyes sideways offset, and ajecent side is eye height. Diagonal is from eye to pointInFrontOfEye.
+    params.pan =  1.0 * PI - atan(pointInFrontOfEye.z - fixtureInfo.position.z, fixtureInfo.position.y);
+    //params.pan =  1.0 * PI + center.x * 2.0;
+
+    // looking from the side. Opposite side: pointInFrontOfEye.x forward + eye forward
+    // and ajecent side is eye height. Diagonal is from eye to pointInFrontOfEye.
+    params.tilt =  atan(pointInFrontOfEye.x - fixtureInfo.position.x, fixtureInfo.position.y);
+
 
     // params.pan = 1.0 * PI;
     // params.tilt = PI / 4.0;
-    params.tilt = sin(time*2.0);
-    params.tilt = 2.6;
+    // params.tilt = sin(time*2.0);
+    //params.tilt = 2.6;
 
-    params.colorWheel = pointInFrontOfEye.z;
+    params.colorWheel = fixtureInfo.position.x;
     params.dimmer = 1.;
 
 }
