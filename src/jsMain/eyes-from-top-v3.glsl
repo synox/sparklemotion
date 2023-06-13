@@ -12,28 +12,28 @@ struct MovingHeadParams {
 };
 
 #define PI 3.14159265358979323846
-#define DISTANCE_FORWARD 500.0 // Inches
-#define DISTANCE_SIDEWAYS 500.0 // Inches to each side
+#define DISTANCE_FORWARD 1000.0 // Inches
+#define DISTANCE_SIDEWAYS 1000.0 // Inches to each side
 
 uniform FixtureInfo fixtureInfo;
 uniform vec2 center; // @@XyPad
+uniform float time; // @@Time
 
 vec2 rotateAroundPoint(vec2 point, vec2 pivot, float angle) {
-    // Translate to origin
+    // Move the point so that the pivot point becomes the origin
     point -= pivot;
-
-    // Rotate
-    float s = sin(angle);
-    float c = cos(angle);
-    mat2 m = mat2(c, -s, s, c);
-    point[0] = c * point[0] - s * point[1];
-    point[1] = s * point[0] + c * point[1];
-
-    // Translate back
-    point += pivot;
-
-    return point;
+    // Perform the rotation
+    float sinAngle = sin(angle);
+    float cosAngle = cos(angle);
+    vec2 rotatedPoint = vec2(
+    point.x * cosAngle - point.y * sinAngle,
+    point.x * sinAngle + point.y * cosAngle
+    );
+    // Move the point back
+    rotatedPoint += pivot;
+    return rotatedPoint;
 }
+
 
 
 // @param params moving-head-params
@@ -50,20 +50,22 @@ void main(out MovingHeadParams params) {
     );
 
     // fixed for testing
-    //targetPoint= vec3(100, 0, -300);
+    targetPoint= vec3(200, 0, 20);
 
     // rotate target into space in front of eye
     vec3 pointInFrontOfEye;
-    pointInFrontOfEye.xz = rotateAroundPoint(targetPoint.xz, fixtureInfo.position.xz, -fixtureInfo.rotation.y);
+    pointInFrontOfEye.xz = rotateAroundPoint(targetPoint.xz, fixtureInfo.position.xz, fixtureInfo.rotation.y);
     pointInFrontOfEye.y = targetPoint.y;
 
     // angle from pointInFrontOfEye to axis at x=0 y=0 z=?
-    params.pan =  1.0 * PI - atan(pointInFrontOfEye.x, fixtureInfo.position.y);
+    params.pan =  1.0 * PI - atan(pointInFrontOfEye.z, fixtureInfo.position.y);
+    params.pan =  1.0 * PI + center.x * 2.0;
     // 2.0 * PI +
 
     // params.pan = 1.0 * PI;
     // params.tilt = PI / 4.0;
-    params.tilt = center.y * 1.6;
+    params.tilt = sin(time*2.0);
+    params.tilt = 2.6;
 
     params.colorWheel = pointInFrontOfEye.z;
     params.dimmer = 1.;
