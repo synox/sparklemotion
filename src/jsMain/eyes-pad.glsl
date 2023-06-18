@@ -19,6 +19,19 @@ uniform FixtureInfo fixtureInfo;
 uniform vec2 pad; // @@XyPad
 uniform float time; // @@Time
 
+/** Rotate a point around the y-axis (yaw)
+ * @param point the point to rotate
+ * @param angle the angle to rotate by
+ * @return the rotated point
+ */
+vec3 rotateAroundYAxis(vec3 point, float angle) {
+    return vec3(
+    cos(angle) * point.x - sin(angle) * point.z,
+    point.y,
+    sin(angle) * point.x + cos(angle) * point.z
+    );
+}
+
 // @param params moving-head-params
 void main(out MovingHeadParams params) {
     // +x is forward (from sheeps perspective)
@@ -30,9 +43,13 @@ void main(out MovingHeadParams params) {
         0.0,
         pad.x * DISTANCE_SIDEWAYS);
 
-    float dx = target.x  - fixtureInfo.position.x;
-    float dy = target.y  - fixtureInfo.position.y;
-    float dz = target.z  - fixtureInfo.position.z;
+    // correct for the yaw-rotation of the fixture
+    vec3 rotatedTarget = rotateAroundYAxis(target, fixtureInfo.rotation.y);
+
+    //We then calculate the dx, dy, and dz differences using this rotated target position instead of the original target position. This should cause the moving head light to correctly point towards the original target position even if it starts with a nonzero yaw.
+    float dx = rotatedTarget.x  - fixtureInfo.position.x;
+    float dy = rotatedTarget.y  - fixtureInfo.position.y;
+    float dz = rotatedTarget.z  - fixtureInfo.position.z;
 
     params.tilt = .0*PI - acos(dx / sqrt(dx*dx+dy*dy+dz*dz));
     params.pan = 1.5*PI+ acos(dz / sqrt(dz*dz+dy*dy));
